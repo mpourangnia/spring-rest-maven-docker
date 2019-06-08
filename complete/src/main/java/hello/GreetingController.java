@@ -1,19 +1,34 @@
 package hello;
 
 import java.util.concurrent.atomic.AtomicLong;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 @RestController
 public class GreetingController {
 
-    private static final String template = "Hello, %s!";
-    private final AtomicLong counter = new AtomicLong();
 
-    @RequestMapping("/greeting")
-    public Greeting greeting(@RequestParam(value="name", defaultValue="World") String name) {
-        return new Greeting(counter.incrementAndGet(),
-                            String.format(template, name));
+    @RequestMapping(value = "/greeting", method = RequestMethod.GET)
+    public String greeting(@RequestParam(required = false) Integer id,
+                           @RequestParam(required = false) String account,
+                           @RequestParam(required = false) String type) throws ResponseStatusException {
+
+        if (account.equals("personal")) {
+            return "Hi userId " + id;
+        }
+
+        if (account.equals("business") && type.equals("big")) {
+            return "Welcome, business user!";
+        }
+
+        if (account.equals("business") && type.equals("small")) {
+            return new PathNotImplementedException().getMessage();
+        }
+
+         else {
+            return "¯\\_(ツ)_/¯";
+        }
     }
 }
